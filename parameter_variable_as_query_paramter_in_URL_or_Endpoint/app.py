@@ -1,4 +1,4 @@
-from flask import Flask, jsonify,make_response,request
+from flask import Flask,jsonify,make_response,request
 from flask_restful import Resource,Api
 
 app=Flask(__name__)
@@ -18,29 +18,28 @@ employees_info = {
 class Help(Resource):
     def get(self):
         help={
-          "All Endpoints": ["/api/v1/esinfo","/api/v1/esinfo/:ename"]
+          "All Endpoints": ["/esinfo"]
         }
         return help
 
 
 class Employees(Resource):
     def get(self,ename=None):
-        print(request.args)
         if request.args:
             if "ename" not in request.args.keys():
                 message={
-                "message": "Please pass query paramter as ename only",
+                "message": "Please use query paramter as ename only",
                 "help": "/esinfo?ename=<your_emp_name>"
                 }
                 return make_response(jsonify(message),400)
-            ename=request.args.get("ename")
-            if ename in employees_info.keys():
-                return employees_info.get(ename)
+            emp=request.args.get("ename")
+            if emp in employees_info.keys():
+                return make_response(jsonify(employees_info.get(emp)),200)
             else:
                 message={
-                "message": "Sorry your employee is not found in my list"
+                "message": "Sorry!! We dont have this emp in our list"
                 }
-                return make_response(jsonify(message),200)
+                return make_response(jsonify(message),404)
         else:
             return make_response(jsonify(employees_info),200)
 
@@ -48,6 +47,6 @@ class Employees(Resource):
 
 api.add_resource(Help,"/")
 
-api.add_resource( Employees, "/api/v1/esinfo","/api/v1/esinfo/<string:ename>")
+api.add_resource( Employees, "/esinfo")
 
 app.run(port=5000,host="localhost",debug=True)
