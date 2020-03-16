@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,make_response,request
+from flask import Flask,request
 from flask_restful import Resource,Api
 
 app=Flask(__name__)
@@ -24,24 +24,23 @@ class Help(Resource):
 
 
 class Employees(Resource):
-    def get(self,ename=None):
+    def get(self):
+        print(request.args)
         if request.args:
             if "ename" not in request.args.keys():
                 message={
-                "message": "Please use query paramter as ename only",
+                "message": "Use only ename as query paramter",
                 "help": "/esinfo?ename=<your_emp_name>"
                 }
-                return make_response(jsonify(message),400)
-            emp=request.args.get("ename")
-            if emp in employees_info.keys():
-                return make_response(jsonify(employees_info.get(emp)),200)
-            else:
-                message={
-                "message": "Sorry!! We dont have this emp in our list"
-                }
-                return make_response(jsonify(message),404)
-        else:
-            return make_response(jsonify(employees_info),200)
+                return message
+            emp_name=request.args.get("ename")
+            if emp_name in employees_info.keys():
+                return employees_info.get(emp_name)
+            message={
+            "message": "Sorry!!! We do not find given emp name in our list"
+            }
+            return message
+        return employees_info
 
 
 
